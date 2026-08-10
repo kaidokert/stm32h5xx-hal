@@ -121,6 +121,17 @@ pub trait GpioExt {
     /// registers accessed and written by this HAL may change in any
     /// patch revision.
     fn split_without_reset(self, prec: Self::Rec) -> Self::Parts;
+
+    /// As [split](GpioExt#tymethod.split), but takes no RCC token and performs
+    /// no RCC access — the caller must have enabled this port's clock from
+    /// privileged context. Intended for unprivileged MPU partitions that are
+    /// granted only this port's MMIO window and thus cannot touch RCC.
+    ///
+    /// # Safety
+    /// The port clock must already be enabled; nothing here enforces it (no
+    /// `Rec` token is consumed). Register state is the caller's responsibility,
+    /// as with [split_without_reset](GpioExt#tymethod.split_without_reset).
+    unsafe fn split_unchecked(self) -> Self::Parts;
 }
 
 /// GPIO peripheral corresponding to GPIOA, GPIOB, etc

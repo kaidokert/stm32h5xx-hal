@@ -40,6 +40,19 @@ macro_rules! gpio {
                         )+
                     }
                 }
+
+                unsafe fn split_unchecked(self) -> Parts {
+                    // No `prec`, no RCC access: the caller enabled this port's
+                    // clock from privileged context. Only the port's own MMIO
+                    // is touched (lazily, by the pin methods), so this is safe
+                    // to call from an unprivileged partition granted just this
+                    // port's window.
+                    Parts {
+                        $(
+                            $pxi: $PXi::new(),
+                        )+
+                    }
+                }
             }
 
             #[doc=concat!("Common type for GPIO", $port_id, " related pins")]
